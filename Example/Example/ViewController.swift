@@ -16,7 +16,9 @@ class ViewController: UIViewController, INDLinkLabelDelegate {
         super.viewDidLoad()
         let RTFPath = Bundle.main.path(forResource: "text", ofType: "rtf")!
         let RTFData = try! Data(contentsOf: URL(fileURLWithPath: RTFPath))
-        let options = [NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType]
+        let options: [NSAttributedString.DocumentReadingOptionKey : Any] = [
+            .documentType : NSAttributedString.DocumentType.rtf
+        ]
         
         label.numberOfLines = 0
         do {
