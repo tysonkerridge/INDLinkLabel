@@ -18,7 +18,7 @@ Pod::Spec.new do |spec|
 
   spec.homepage     = "https://github.com/indragiek/INDLinkLabel"
 
-  spec.license      = { :type => "MIT", :file => "LICENSE.md" }
+  spec.license      = { :type => "MIT", :file => "LICENSE" }
 
   spec.author             = "Indragie Karunaratne"
   spec.social_media_url   = "http://twitter.com/indragie"
