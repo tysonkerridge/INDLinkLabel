@@ -116,7 +116,7 @@ import UIKit
         addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(INDLinkLabel.handleLongPress(_:))))
     }
     
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         commonInit()
     }
@@ -201,13 +201,42 @@ import UIKit
     
     // MARK: Touches
     
+    /// Can override and send a different frame
+    open var frameProvider: CGRect? {
+        nil
+    }
+    
+    private var fakeView = UIView()
     fileprivate func linkRangeAtPoint(_ point: CGPoint) -> LinkRange? {
+        
+        // Convert the point if a different frame is provided
+        // this is to handle the case where the label is auto-balanced and text is drawn differently
+        // https://stackoverflow.com/questions/26530330/balance-multi-line-uilabel
+        let pointToUse: CGPoint
+        let frameToUse: CGRect
+        if let frame = frameProvider {
+            frameToUse = frame
+            fakeView.frame = frame
+            // Convert the point from ourselves and keep the x pos
+            // eg. We're 300pt, but our autobalance is 200pt, and therefore
+            //     the center is 150pt for us, but for autobalance its 100pt
+            //     so needs to be converted as the point is still at 150pt
+            let converted = fakeView.convert(point, from: self)
+            var _point = point
+            _point.x = converted.x
+            pointToUse = _point
+        } else {
+            frameToUse = frame
+            pointToUse = point
+        }
+        let point = pointToUse
+        
         if let linkRanges = linkRanges {
             // Passing in the UILabel's fitting size here doesn't work, the height
             // needs to be unrestricted for it to correctly lay out all the text.
             // Might be due to a difference in the computed text sizes of `UILabel`
             // and `NSLayoutManager`.
-            textContainer.size = CGSize(width: bounds.width, height: CGFloat.greatestFiniteMagnitude)
+            textContainer.size = CGSize(width: frameToUse.width, height: CGFloat.greatestFiniteMagnitude)
             layoutManager.ensureLayout(for: textContainer)
             let boundingRect = layoutManager.boundingRect(forGlyphRange: layoutManager.glyphRange(for: textContainer), in: textContainer)
             
